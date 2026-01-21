@@ -9,11 +9,12 @@ import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import { useQuery } from "@tanstack/react-query";
+import ReactPaginate from "react-paginate";
 
 const App = () => {
   const [modalMovie, setModalMovie] = useState<Movie | null>(null);
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   const movieQuery = useQuery({
     enabled: query.length !== 0 && page > 0,
@@ -24,6 +25,7 @@ const App = () => {
   const loading = movieQuery.isLoading;
   const error = movieQuery.isError;
   const movies = movieQuery.data?.results || [];
+  const totalPages = movieQuery.data?.total_pages ?? 0;
 
   const handleSubmit = async (query: string) => {
     setPage(1);
@@ -33,6 +35,19 @@ const App = () => {
     <div className={css["app"]}>
       <div>
         <SearchBar onSubmit={handleSubmit} />
+        {movieQuery && totalPages > 1 && (
+          <ReactPaginate
+            pageCount={totalPages}
+            pageRangeDisplayed={5}
+            marginPagesDisplayed={1}
+            onPageChange={({ selected }) => setPage(selected + 1)}
+            forcePage={page - 1}
+            containerClassName={css.pagination}
+            activeClassName={css.active}
+            nextLabel="→"
+            previousLabel="←"
+          />
+        )}
         <MovieGrid movies={movies} onSelect={setModalMovie} />
         {loading && <Loader />}
         {error && <ErrorMessage />}
@@ -45,13 +60,6 @@ const App = () => {
           />
         )}
         <Toaster />
-        <button
-          onClick={() => {
-            setPage(page + 1);
-          }}
-        >
-          load More
-        </button>
       </div>
     </div>
   );
