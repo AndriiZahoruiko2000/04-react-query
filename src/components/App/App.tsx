@@ -1,4 +1,3 @@
-import toast, { Toaster } from "react-hot-toast";
 import css from "./App.module.css";
 import SearchBar from "../SearchBar/SearchBar";
 import { fetchMovies } from "../../services/movieService";
@@ -59,7 +58,6 @@ const App = () => {
             }}
           />
         )}
-        <Toaster />
       </div>
     </div>
   );
