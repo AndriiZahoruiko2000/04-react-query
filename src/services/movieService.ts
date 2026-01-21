@@ -10,13 +10,14 @@ interface FetchMovieResponse {
   total_pages: number;
 }
 
-export async function fetchMovies(query: string) {
+export async function fetchMovies(query: string, page: number) {
   const baseURL = "https://api.themoviedb.org/3";
   const endPoint = "/search/movie";
   const url = baseURL + endPoint;
 
   const params = {
     query,
+    page,
   };
 
   const headers = {

@@ -8,30 +8,26 @@ import MovieGrid from "../MovieGrid/MovieGrid";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
+import { useQuery } from "@tanstack/react-query";
 
 const App = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [modalMovie, setModalMovie] = useState<Movie | null>(null);
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+
+  const movieQuery = useQuery({
+    enabled: query.length !== 0 && page > 0,
+    queryKey: ["fetchMovies", query, page],
+    queryFn: () => fetchMovies(query, page),
+  });
+
+  const loading = movieQuery.isLoading;
+  const error = movieQuery.isError;
+  const movies = movieQuery.data?.results || [];
 
   const handleSubmit = async (query: string) => {
-    setMovies([]);
-    setLoading(true);
-    setError(false);
-    try {
-      const response = await fetchMovies(query);
-      console.log(response);
-
-      if (response.results.length === 0) {
-        toast.error("No movies found for your request.");
-        return;
-      }
-      setMovies(response.results);
-    } catch (error) {
-      setError(true);
-    }
-    setLoading(false);
+    setPage(1);
+    setQuery(query);
   };
   return (
     <div className={css["app"]}>
@@ -49,6 +45,13 @@ const App = () => {
           />
         )}
         <Toaster />
+        <button
+          onClick={() => {
+            setPage(page + 1);
+          }}
+        >
+          load More
+        </button>
       </div>
     </div>
   );
