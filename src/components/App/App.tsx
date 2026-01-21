@@ -1,7 +1,8 @@
+import toast, { Toaster } from "react-hot-toast";
 import css from "./App.module.css";
 import SearchBar from "../SearchBar/SearchBar";
 import { fetchMovies } from "../../services/movieService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Movie } from "../../types/movie";
 import MovieGrid from "../MovieGrid/MovieGrid";
 import Loader from "../Loader/Loader";
@@ -31,10 +32,18 @@ const App = () => {
     setPage(1);
     setQuery(query);
   };
+
+  useEffect(() => {
+    if (movieQuery && movieQuery.data?.results.length === 0) {
+      toast.error("");
+    }
+  }, [movieQuery, movieQuery.data]);
+
   return (
     <div className={css["app"]}>
       <div>
         <SearchBar onSubmit={handleSubmit} />
+        <Toaster />
         {movieQuery && totalPages > 1 && (
           <ReactPaginate
             pageCount={totalPages}
